@@ -1,30 +1,44 @@
 # Eurovision Draft
 
-A web app for submitting Eurovision songs to a shared pool and voting on them.
+A web app for running a Eurovision song draft — users anonymously submit songs to a shared pool, vote on them with Eurovision-style jury points, and watch results revealed one voter at a time.
+
+## Tech Stack
+
+| | |
+|---|---|
+| **Frontend** | React 19 + Vite |
+| **Backend** | Node.js + Express |
+| **Database** | sql.js (SQLite-in-memory, persisted to `server/data/eurovision.db`) |
+
+The Express server serves both the API (`/api/*`) and the pre-built React frontend from `client/dist`, so only one process needs to run in production.
 
 ## Setup
 
 ### Prerequisites
 - Node.js 18+
 
-### Server
+### First-time setup
+
 ```bash
+# Install server dependencies
 cd server
 npm install
-npm run seed    # populate the database with Eurovision songs (1956-2025)
-npm run dev     # start the API on http://localhost:3001
-```
 
-### Client
-```bash
-cd client
+# Seed the database with all Eurovision songs (1956–2025, ~1800 songs)
+node seed.js
+
+# Install client dependencies and build
+cd ../client
 npm install
-npm run dev     # start Vite on http://localhost:5173
+npm run build
 ```
 
-## Features
-- **Browse** all Eurovision songs (1956-2025) with search, country, and year filters
-- **Submit** up to 2 songs per user to the shared pool
-- **Vote** on submitted songs (1-10 scale)
-- **Rankings** — pool sorted by average score
-- Duplicate submission prevention (each song can only be submitted once)
+### Running
+
+```bash
+cd server
+node index.js
+# → http://localhost:3001
+```
+
+To use a different port: `PORT=8080 node index.js`
