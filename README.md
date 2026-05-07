@@ -8,9 +8,7 @@ A web app for running a Eurovision song draft — users anonymously submit songs
 |---|---|
 | **Frontend** | React 19 + Vite |
 | **Backend** | Node.js + Express |
-| **Database** | sql.js (SQLite-in-memory, persisted to `server/data/eurovision.db`) |
-
-The Express server serves both the API (`/api/*`) and the pre-built React frontend from `client/dist`, so only one process needs to run in production.
+| **Database** | sql.js (SQLite-in-memory, persisted to `server/eurovision.db`) |
 
 ## Setup
 
