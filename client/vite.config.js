@@ -4,9 +4,10 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: '/eurovision/',
   server: {
     proxy: {
-      '/api': 'http://localhost:3001',
+      '/eurovision/api': 'http://localhost:3001',
     },
   },
 })

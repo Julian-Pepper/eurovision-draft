@@ -16,6 +16,8 @@ async function init() {
   app.use(cors());
   app.use(express.json());
 
+  const router = express.Router();
+
   // Helper: run a SELECT and return all rows as objects
   function queryAll(sql, params = []) {
     const stmt = db.prepare(sql);
@@ -46,7 +48,7 @@ async function init() {
 
   // ─── Songs ──────────────────────────────────────────────────────────────────
 
-  app.get('/api/songs', (req, res) => {
+  router.get('/api/songs', (req, res) => {
     const { search, country, year, page = 1, limit = 50 } = req.query;
     const conditions = [];
     const params = [];
@@ -84,12 +86,12 @@ async function init() {
     res.json({ songs, total: countRow.total, page: Number(page), limit: Number(limit) });
   });
 
-  app.get('/api/songs/countries', (_req, res) => {
+  router.get('/api/songs/countries', (_req, res) => {
     const rows = queryAll('SELECT DISTINCT country FROM songs ORDER BY country');
     res.json(rows.map(r => r.country));
   });
 
-  app.get('/api/songs/years', (_req, res) => {
+  router.get('/api/songs/years', (_req, res) => {
     const rows = queryAll('SELECT DISTINCT year FROM songs ORDER BY year DESC');
     res.json(rows.map(r => r.year));
   });
@@ -97,7 +99,7 @@ async function init() {
   // ─── Submissions (anonymous) ───────────────────────────────────────────────
 
   // POST /api/submissions — submit a song (anonymous to others)
-  app.post('/api/submissions', (req, res) => {
+  router.post('/api/submissions', (req, res) => {
     const { song_id, username } = req.body;
 
     if (!song_id || !username || typeof username !== 'string' || username.trim().length === 0) {
@@ -134,7 +136,7 @@ async function init() {
   });
 
   // GET /api/my-submissions/:username — user's own submissions
-  app.get('/api/my-submissions/:username', (req, res) => {
+  router.get('/api/my-submissions/:username', (req, res) => {
     const username = req.params.username;
     const submissions = queryAll(
       `SELECT sub.id, sub.song_id, sub.submitted_at, s.year, s.country, s.artist, s.song, s.youtube_url
@@ -146,7 +148,7 @@ async function init() {
   });
 
   // DELETE /api/submissions/:id — remove own submission
-  app.delete('/api/submissions/:id', (req, res) => {
+  router.delete('/api/submissions/:id', (req, res) => {
     const { username } = req.body;
     const subId = Number(req.params.id);
 
@@ -163,13 +165,13 @@ async function init() {
   // ─── Voting (Eurovision-style) ─────────────────────────────────────────────
 
   // GET /api/voting/state — current voting state
-  app.get('/api/voting/state', (_req, res) => {
+  router.get('/api/voting/state', (_req, res) => {
     const state = getSetting('voting_state') || 'closed';
     res.json({ state });
   });
 
   // POST /api/voting/state — admin: change voting state
-  app.post('/api/voting/state', (req, res) => {
+  router.post('/api/voting/state', (req, res) => {
     const { state, admin_password } = req.body;
     const correctPw = getSetting('admin_password');
 
@@ -186,7 +188,7 @@ async function init() {
   });
 
   // GET /api/voting/submissions — get all submissions for voting (when voting is open)
-  app.get('/api/voting/submissions', (req, res) => {
+  router.get('/api/voting/submissions', (req, res) => {
     const state = getSetting('voting_state');
     const { username } = req.query;
 
@@ -217,7 +219,7 @@ async function init() {
   });
 
   // POST /api/votes — submit Eurovision-style points (12, 10, 8-1)
-  app.post('/api/votes', (req, res) => {
+  router.post('/api/votes', (req, res) => {
     const { username, votes } = req.body;
     // votes = { submission_id: points, ... }
     // Valid Eurovision points: 12, 10, 8, 7, 6, 5, 4, 3, 2, 1
@@ -282,7 +284,7 @@ async function init() {
   });
 
   // GET /api/votes/:username — get user's current votes
-  app.get('/api/votes/:username', (req, res) => {
+  router.get('/api/votes/:username', (req, res) => {
     const state = getSetting('voting_state');
     if (state === 'closed') {
       return res.status(403).json({ error: 'Voting is not open' });
@@ -297,7 +299,7 @@ async function init() {
   });
 
   // GET /api/results — final scores, sorted lowest to highest
-  app.get('/api/results', (_req, res) => {
+  router.get('/api/results', (_req, res) => {
     const state = getSetting('voting_state');
     if (state !== 'revealed') {
       return res.status(403).json({ error: 'Results have not been revealed yet', state });
@@ -331,7 +333,7 @@ async function init() {
   // ─── Admin ──────────────────────────────────────────────────────────────────
 
   // POST /api/admin/verify — verify admin password
-  app.post('/api/admin/verify', (req, res) => {
+  router.post('/api/admin/verify', (req, res) => {
     const { admin_password } = req.body;
     const correctPw = getSetting('admin_password');
     if (admin_password === correctPw) {
@@ -342,7 +344,7 @@ async function init() {
   });
 
   // GET /api/admin/submissions — admin view of all submissions (shows who submitted what)
-  app.post('/api/admin/submissions', (req, res) => {
+  router.post('/api/admin/submissions', (req, res) => {
     const { admin_password } = req.body;
     const correctPw = getSetting('admin_password');
     if (admin_password !== correctPw) {
@@ -362,13 +364,13 @@ async function init() {
   // ─── Watching ─────────────────────────────────────────────────────────────
 
   // GET /api/watching/state — current watching state
-  app.get('/api/watching/state', (_req, res) => {
+  router.get('/api/watching/state', (_req, res) => {
     const state = getSetting('watching_state') || 'closed';
     res.json({ state });
   });
 
   // POST /api/watching/state — admin: toggle watching open/closed
-  app.post('/api/watching/state', (req, res) => {
+  router.post('/api/watching/state', (req, res) => {
     const { state, admin_password } = req.body;
     const correctPw = getSetting('admin_password');
 
@@ -385,13 +387,13 @@ async function init() {
   });
 
   // GET /api/watching/count — total submission count (always available)
-  app.get('/api/watching/count', (_req, res) => {
+  router.get('/api/watching/count', (_req, res) => {
     const row = queryOne('SELECT COUNT(*) as count FROM submissions');
     res.json({ count: row ? row.count : 0 });
   });
 
   // GET /api/watching/submitters — list of submitters with song counts (always available)
-  app.get('/api/watching/submitters', (_req, res) => {
+  router.get('/api/watching/submitters', (_req, res) => {
     const rows = queryAll(`
       SELECT username, COUNT(*) as song_count
       FROM submissions
@@ -402,7 +404,7 @@ async function init() {
   });
 
   // GET /api/watching/submissions — all submissions for watching (when open)
-  app.get('/api/watching/submissions', (_req, res) => {
+  router.get('/api/watching/submissions', (_req, res) => {
     const state = getSetting('watching_state');
     if (state !== 'open') {
       return res.status(403).json({ error: 'Watching is not open yet' });
@@ -420,15 +422,17 @@ async function init() {
 
   // Serve the built React frontend
   const clientDist = path.join(__dirname, '..', 'client', 'dist');
-  app.use(express.static(clientDist));
+  router.use(express.static(clientDist));
   // SPA fallback — serve index.html for any non-API route
-  app.get('*', (req, res) => {
+  router.get('*', (req, res) => {
     res.sendFile(path.join(clientDist, 'index.html'));
   });
 
+  app.use('/eurovision', router);
+
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
-    console.log(`Eurovision Draft running on http://localhost:${PORT}`);
+    console.log(`Eurovision Draft running on http://localhost:${PORT}/eurovision/`);
   });
 }
 

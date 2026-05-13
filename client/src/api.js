@@ -1,4 +1,4 @@
-const API = '/api';
+const API = '/eurovision/api';
 
 async function request(path, options = {}) {
   const res = await fetch(`${API}${path}`, {

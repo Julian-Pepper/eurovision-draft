@@ -36,7 +36,7 @@ npm run build
 ```bash
 cd server
 node index.js
-# → http://localhost:3001
+# → http://localhost:3001/eurovision/
 ```
 
 To use a different port: `PORT=8080 node index.js`
