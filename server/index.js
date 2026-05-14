@@ -432,7 +432,7 @@ async function init() {
 
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
-    console.log(`Eurovision Draft running on http://localhost:${PORT}/eurovision/`);
+    console.log(`Eurovision Smackdown running on http://localhost:${PORT}/eurovision/`);
   });
 }
 
