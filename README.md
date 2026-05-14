@@ -1,6 +1,6 @@
-# Eurovision Draft
+# Eurovision Smackdown
 
-A web app for running a Eurovision song draft — users anonymously submit songs to a shared pool, vote on them with Eurovision-style jury points, and watch results revealed one voter at a time.
+A web app for running a Eurovision song smackdown — users anonymously submit songs to a shared pool, vote on them with Eurovision-style jury points, and watch results revealed one voter at a time.
 
 ## Tech Stack
 
