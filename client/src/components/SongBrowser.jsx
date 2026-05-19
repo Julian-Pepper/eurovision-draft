@@ -180,8 +180,10 @@ export default function SongBrowser({ username, onSubmit }) {
                   <span className="song-country">{getFlagEmoji(song.country)} {song.country}</span>
                   <div className="song-title">{song.song}</div>
                   <div className="song-artist">{song.artist}</div>
-                  {song.place_final && <span className="song-place">#{song.place_final}</span>}
-                  {song.points_final !== null && song.points_final !== undefined && <span className="song-points">{song.points_final} pts</span>}
+                  <div className="song-place-points">
+                    {song.place_final && <span className="song-place">#{song.place_final}</span>}
+                    {song.points_final !== null && song.points_final !== undefined && <span className="song-points">{song.points_final} pts</span>}
+                  </div>
                 </div>
                 <div className="song-actions">
                   {mySubmittedSongIds.has(song.id) ? (

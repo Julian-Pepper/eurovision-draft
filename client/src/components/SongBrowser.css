@@ -194,6 +194,10 @@
 }
 
 .song-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
   font-weight: 600;
   font-size: 1rem;
   min-width: 200px;
@@ -201,8 +205,19 @@
 }
 
 .song-artist {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
   color: #8888a0;
   font-size: 0.9rem;
+}
+
+.song-place-points {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
 }
 
 .song-place {
