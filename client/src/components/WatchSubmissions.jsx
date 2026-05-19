@@ -13,6 +13,15 @@ function getYoutubeThumbnail(url) {
   return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null;
 }
 
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export default function WatchSubmissions() {
   const [state, setState] = useState('closed');
   const [submissions, setSubmissions] = useState([]);
@@ -45,7 +54,7 @@ export default function WatchSubmissions() {
       setSubmitters(submittersData);
       if (data.state === 'open') {
         const subs = await api.getWatchingSubmissions();
-        setSubmissions(subs);
+        setSubmissions(shuffleArray(subs));
       }
     } catch (e) {
       // state might just be closed
@@ -72,7 +81,7 @@ export default function WatchSubmissions() {
       setState(newState);
       if (newState === 'open') {
         const subs = await api.getWatchingSubmissions();
-        setSubmissions(subs);
+        setSubmissions(shuffleArray(subs));
         setCurrentIndex(0);
         setAutoplay(false);
       } else {
