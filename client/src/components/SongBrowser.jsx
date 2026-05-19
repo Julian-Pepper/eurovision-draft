@@ -16,6 +16,7 @@ export default function SongBrowser({ username, onSubmit }) {
   const [error, setError] = useState('');
   const [playingId, setPlayingId] = useState(null);
   const [toast, setToast] = useState('');
+  const [toastType, setToastType] = useState('');
   const [mySubmittedSongIds, setMySubmittedSongIds] = useState(new Set());
   const [mySubmissionMap, setMySubmissionMap] = useState({}); // song_id -> submission_id
 
@@ -75,11 +76,17 @@ export default function SongBrowser({ username, onSubmit }) {
       await loadMySubmissions();
       if (onSubmit) onSubmit();
       setToast('✅ Song submitted!');
-      setTimeout(() => setToast(''), 3000);
+      setToastType('success');
+      setTimeout(() => { setToast(''); setToastType(''); }, 3000);
     } catch (e) {
       if (e.message.includes('already picked')) {
         setToast('😬 ' + e.message);
-        setTimeout(() => setToast(''), 4000);
+        setToastType('warning');
+        setTimeout(() => { setToast(''); setToastType(''); }, 5000);
+      } else if (e.message.includes('maximum reached')) {
+        setToast('🚫 ' + e.message);
+        setToastType('error');
+        setTimeout(() => { setToast(''); setToastType(''); }, 4000);
       } else {
         setError(e.message);
       }
@@ -98,7 +105,8 @@ export default function SongBrowser({ username, onSubmit }) {
       await loadMySubmissions();
       if (onSubmit) onSubmit();
       setToast('🗑️ Song removed.');
-      setTimeout(() => setToast(''), 3000);
+      setToastType('success');
+      setTimeout(() => { setToast(''); setToastType(''); }, 3000);
     } catch (e) {
       setError(e.message);
     }
@@ -133,7 +141,8 @@ export default function SongBrowser({ username, onSubmit }) {
         </select>
       </div>
 
-      {toast && <div className="toast-msg">{toast}</div>}
+      {toast && toastType === 'warning' && <div className="toast-backdrop" onClick={() => { setToast(''); setToastType(''); }} />}
+      {toast && <div className={`toast-msg${toastType === 'warning' ? ' toast-warning' : toastType === 'error' ? ' toast-error' : ''}`}>{toast}</div>}
       {error && <div className="error-msg">{error}</div>}
 
       {loading ? (
